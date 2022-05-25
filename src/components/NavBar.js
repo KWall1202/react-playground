@@ -6,7 +6,7 @@ function Navbar() {
     <nav>
       <ul>
         <li>
-          <Link to="/">Home</Link>
+          <Link to="/react-playground">Home</Link>
         </li>
         <li>
           <Link to="/weather">Weather</Link>
