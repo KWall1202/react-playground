@@ -1,16 +1,21 @@
 import React from "react";
+import "./NavBar.css";
 import { Link } from "react-router-dom";
+
+function NavBarElement(props) {
+  return <li className="NavElement">{props.children}</li>;
+}
 
 function Navbar() {
   return (
-    <nav>
-      <ul>
-        <li>
+    <nav className="NavBar">
+      <ul className="NavList">
+        <NavBarElement>
           <Link to="/react-playground">Home</Link>
-        </li>
-        <li>
+        </NavBarElement>
+        <NavBarElement>
           <Link to="/weather">Weather</Link>
-        </li>
+        </NavBarElement>
       </ul>
     </nav>
   );
