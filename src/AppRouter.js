@@ -10,7 +10,8 @@ function AppRouter() {
             <NavBar />
             <Routes>
                 <Route exact path='/react-playground' element={<App />} />
-                <Route path='/weather' element={<Weather />}  />
+                <Route path='/react-playground/home' element={<App />} />
+                <Route path='/react-playground/weather' element={<Weather />}  />
             </Routes>
         </Router>
     )

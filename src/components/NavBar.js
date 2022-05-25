@@ -11,10 +11,10 @@ function Navbar() {
     <nav className="NavBar">
       <ul className="NavList">
         <NavBarElement>
-          <Link to="/react-playground">Home</Link>
+          <Link to="/react-playground/home">Home</Link>
         </NavBarElement>
         <NavBarElement>
-          <Link to="/weather">Weather</Link>
+          <Link to="/react-playground/weather">Weather</Link>
         </NavBarElement>
       </ul>
     </nav>
