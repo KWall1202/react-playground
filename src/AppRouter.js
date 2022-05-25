@@ -9,7 +9,7 @@ function AppRouter() {
         <Router>
             <NavBar />
             <Routes>
-                <Route exact path='/' element={<App />} />
+                <Route exact path='/react-playground' element={<App />} />
                 <Route path='/weather' element={<Weather />}  />
             </Routes>
         </Router>
