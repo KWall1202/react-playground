@@ -1,5 +1,5 @@
 import React from "react";
-
+import ForecastTable from "./ForecastTable";
 
 class Weather extends React.Component {
     constructor(props) {
@@ -50,7 +50,7 @@ class Weather extends React.Component {
                     ...this.state.forecast,
                     data: data,
                 },
-            })
+            });
         }).catch(console.log);
     }
 
@@ -74,8 +74,6 @@ class Weather extends React.Component {
     }
 
     render() {
-        const forecastString = this.state.forecast.data ? JSON.stringify(this.state.forecast.data) : null;
-        const forecastHourlyString = this.state.forecastHourly.data ? JSON.stringify(this.state.forecastHourly.data) : null;
         return (
             <div>
             <button onClick={() => this.getForecast()}>
@@ -84,12 +82,8 @@ class Weather extends React.Component {
             <button onClick={() => this.getHourlyForecast()}>
                 Get the hourly forecast
             </button>
-            <p>
-                {forecastString}
-            </p>
-            <p>
-                {forecastHourlyString}
-            </p>
+            <ForecastTable forecastData={this.state.forecastHourly.data}/>
+            <ForecastTable forecastData={this.state.forecast.data}/>
             </div>
         ); 
     }

@@ -1,0 +1,14 @@
+.ForecastList {
+    display: flex;
+    list-style-type: none;
+    background-color: aquamarine;
+    margin: 5%;
+}
+
+.ForecastListElement {
+    padding: 0.2em;
+}
+
+.WeatherIcon {
+    
+}
