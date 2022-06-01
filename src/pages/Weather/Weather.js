@@ -16,7 +16,7 @@ class Weather extends React.Component {
                 url: null,
                 data: null,
             },
-            forecastDisplay: null,
+            forecastDisplayHourly: null,
         };
     }
 
@@ -36,6 +36,9 @@ class Weather extends React.Component {
                     url: data.properties.forecastHourly,
                     data: null,
                 },
+            }, () => {
+                this.getForecastAPI();
+                this.getForecastHourlyAPI();
             });
         }).catch(console.log);
     }
@@ -52,7 +55,6 @@ class Weather extends React.Component {
                     ...this.state.forecast,
                     data: data,
                 },
-                forecastDisplayData: data,
             });
         }).catch(console.log);
     }
@@ -69,8 +71,23 @@ class Weather extends React.Component {
                     ...this.state.forecastHourly,
                     data: data,
                 },
-                forecastDisplayData: data,
             })
+        }).catch(console.log);
+    }
+
+    async getLatLongFromZipAPI(zipcode) {
+        const url = new URL("https://forecast.weather.gov/zipcity.php?" + new URLSearchParams({inputstring: zipcode}));
+        fetch(url)
+        .then(res => new URL(res.url))
+        .then((data) => {
+            if (data.searchParams.get("inputstring")) return;
+            const lat = data.searchParams.get("lat");
+            const long = data.searchParams.get("lon")
+            this.setState({
+                ...this.state,
+                lat: lat,
+                long: long,
+            }, () => this.getWeatherAPI())
         }).catch(console.log);
     }
 
@@ -79,7 +96,7 @@ class Weather extends React.Component {
         .then(() => {
         this.setState({
             ...this.state,
-            forecastDisplay: this.state.forecast.data,
+            forecastDisplayHourly: false,
             })
         }).catch(console.log);
     }
@@ -89,9 +106,20 @@ class Weather extends React.Component {
         .then(() => {
             this.setState({
                 ...this.state,
-                forecastDisplay: this.state.forecastHourly.data,
+                forecastDisplayHourly: true,
             })
         }).catch(console.log);
+    }
+
+    getLatLongFromZip(event) {
+        event.preventDefault();
+        this.getLatLongFromZipAPI(event.target.zipcode.value);
+    }
+
+    getDisplayData() {
+        if (this.state.forecastDisplayHourly === null) return null;
+        if (this.state.forecastDisplayHourly) return this.state.forecastHourly.data;
+        return this.state.forecast.data;
     }
 
     componentDidMount() {
@@ -101,13 +129,18 @@ class Weather extends React.Component {
     render() {
         return (
             <div className="Weather">
-            <button onClick={() => this.getForecast()}>
+            <form onSubmit={(e) => this.getLatLongFromZip(e)}>
+                <label htmlFor="zipcode">Zip Code:</label>
+                <input label="zipcode" type="text" name="zipcode"/>
+                <input type="submit" value="Enter"/>
+            </form>
+            <button onClick={this.getForecast.bind(this)}>
                 Get the forecast
             </button>
-            <button onClick={() => this.getForecastHourly()}>
+            <button onClick={this.getForecastHourly.bind(this)}>
                 Get the hourly forecast
             </button>
-            <ForecastTable forecastData={this.state.forecastDisplay}/>
+            <ForecastTable forecastData={this.getDisplayData()}/>
             </div>
         ); 
     }
