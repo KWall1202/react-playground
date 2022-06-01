@@ -5,7 +5,7 @@ function ForecastTable(props) {
     if (!props.forecastData) return;
     const elements = props.forecastData.properties.periods.map((period) => (<ForecastTableElement key={period.number} period={period}/>));
     return (
-        <div>
+        <div className="ForecastTable">
             <p>
                 Upcoming Forecast
             </p>

@@ -20,28 +20,31 @@ import "./Weather.css";
  * }
  */
 
-function ForecastListElement(props) {
-    return <li className="ForecastListElement">{props.children}</li>;
-}
-
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const amPm = date.getHours() < 12 ? "AM" : "PM";
+    const hours = (date.getHours() === 0 ? 12 : date.getHours() > 12 ? date.getHours() - 12 : date.getHours()).toString();
+    const options = {day: 'numeric', month: 'long'}
+    const day = date.toLocaleString(undefined, options);
+    return `${hours}:00 ${amPm}, ${day}`
+  };
 
 function ForecastTableElement(props) {
     const cast = props.period;
+    const periodName = cast.name ? cast.name : formatDate(cast.startTime);
     return (
-        <div>
-            <ul className="ForecastList">
-                <ForecastListElement>
-                    <img className="WeatherIcon" src={cast.icon} alt="Weather Icon"/>
-                </ForecastListElement>
-                <ForecastListElement>
-                    <p>{cast.name}</p>
+        <span className="ForecastList">
+            <span className="ForecastIconAndText">
+                <img className="WeatherIcon" src={cast.icon} alt="Weather Icon"/>
+                <div className="Forecast">
+                    <p className="Period">{periodName}</p>
                     <p>{cast.shortForecast}</p> 
-                </ForecastListElement>
-                <ForecastListElement>
-                    <p>{cast.temperature} {cast.temperatureUnit}</p>
-                </ForecastListElement>
-            </ul>
-        </div>
+                </div>
+            </span>
+            <div className="Temperature">
+                <p>{cast.temperature} {cast.temperatureUnit}</p>
+            </div>   
+        </span>
     );
 }
 

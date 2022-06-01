@@ -16,10 +16,11 @@ class Weather extends React.Component {
                 url: null,
                 data: null,
             },
+            forecastDisplay: null,
         };
     }
 
-    async getWeather() {
+    async getWeatherAPI() {
         const url = 'https://api.weather.gov/points/' + this.state.lat + ',' + this.state.long;
         fetch(url)
         .then(res => res.json())
@@ -39,8 +40,9 @@ class Weather extends React.Component {
         }).catch(console.log);
     }
 
-    async getForecast() {
+    async getForecastAPI() {
         if (!this.state.forecast.url) return;
+        if (this.state.forecast.data) return;
         fetch(this.state.forecast.url)
         .then(res => res.json())
         .then((data) => {
@@ -50,12 +52,14 @@ class Weather extends React.Component {
                     ...this.state.forecast,
                     data: data,
                 },
+                forecastDisplayData: data,
             });
         }).catch(console.log);
     }
 
-    async getHourlyForecast() {
+    async getForecastHourlyAPI() {
         if (!this.state.forecastHourly.url) return;
+        if (this.state.forecastHourly.data) return;
         fetch(this.state.forecastHourly.url)
         .then(res => res.json())
         .then((data) => {
@@ -65,25 +69,45 @@ class Weather extends React.Component {
                     ...this.state.forecastHourly,
                     data: data,
                 },
+                forecastDisplayData: data,
+            })
+        }).catch(console.log);
+    }
+
+    getForecast() {
+        this.getForecastAPI()
+        .then(() => {
+        this.setState({
+            ...this.state,
+            forecastDisplay: this.state.forecast.data,
+            })
+        }).catch(console.log);
+    }
+
+    getForecastHourly() {
+        this.getForecastHourlyAPI()
+        .then(() => {
+            this.setState({
+                ...this.state,
+                forecastDisplay: this.state.forecastHourly.data,
             })
         }).catch(console.log);
     }
 
     componentDidMount() {
-        this.getWeather();
+        this.getWeatherAPI();
     }
 
     render() {
         return (
-            <div>
+            <div className="Weather">
             <button onClick={() => this.getForecast()}>
                 Get the forecast
             </button>
-            <button onClick={() => this.getHourlyForecast()}>
+            <button onClick={() => this.getForecastHourly()}>
                 Get the hourly forecast
             </button>
-            <ForecastTable forecastData={this.state.forecastHourly.data}/>
-            <ForecastTable forecastData={this.state.forecast.data}/>
+            <ForecastTable forecastData={this.state.forecastDisplay}/>
             </div>
         ); 
     }

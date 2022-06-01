@@ -1,14 +1,47 @@
-.ForecastList {
-    display: flex;
-    list-style-type: none;
-    background-color: aquamarine;
-    margin: 5%;
+.Weather {
+    background-color: #282c34;
+    min-height: 100vh;
+    color: white;
 }
 
-.ForecastListElement {
+.ForecastTable {
+    padding-bottom: 20px;
+}
+
+.ForecastList {
+    display: flex;
+    background-color: lightblue;
+    margin: 15px;
+    border-style: none;
+    border-radius: 50px;
+    justify-content: space-between;
+    color: black;
+    font-weight: 500;
+}
+
+.Forecast {
     padding: 0.2em;
 }
 
+.ForecastIconAndText {
+    display: flex;
+}
+
+.Period {
+    font-size: 1.2em;
+}
+
 .WeatherIcon {
-    
+    border-radius: 1em;
+    margin-left: 35px;
+    margin-right: 1em;
+    margin-top: 4px;
+    height: 100px;
+    width: auto;
+}
+
+.Temperature {
+    font-size: xx-large;
+    margin-right: 1em;
+    white-space: nowrap;
 }
