@@ -33,7 +33,7 @@ function ForecastTableElement(props) {
     const cast = props.period;
     const periodName = cast.name ? cast.name : formatDate(cast.startTime);
     return (
-        <span className="ForecastList">
+        <span className="ForecastTableElement">
             <span className="ForecastIconAndText">
                 <img className="WeatherIcon" src={cast.icon} alt="Weather Icon"/>
                 <div className="Forecast">
