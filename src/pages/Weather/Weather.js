@@ -1,149 +1,96 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import Navbar from "../../components/NavBar";
 import ForecastTable from "./ForecastTable";
+import { Routes, Route, Link, useSearchParams} from "react-router-dom";
 
-class Weather extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            lat: '42.0897',
-            long: '-75.9125',
-            weatherData: null,
-            forecast: {
-                url: null,
-                data: null,
-            },
-            forecastHourly: {
-                url: null,
-                data: null,
-            },
-            forecastDisplayHourly: null,
-        };
-    }
+async function getForecastAPI(url, setForecast) {
+    if (!url) return;
+    fetch(url)
+    .then(res => res.json())
+    .then((data) => {
+        setForecast(data);
+    }).catch(console.log);
+}
 
-    async getWeatherAPI() {
-        const url = 'https://api.weather.gov/points/' + this.state.lat + ',' + this.state.long;
-        fetch(url)
-        .then(res => res.json())
-        .then((data) => {
-            this.setState({
-                ...this.state,
-                weatherData: data,
-                forecast: {
-                    url: data.properties.forecast,
-                    data: null,
-                },
-                forecastHourly: {
-                    url: data.properties.forecastHourly,
-                    data: null,
-                },
-            }, () => {
-                this.getForecastAPI();
-                this.getForecastHourlyAPI();
-            });
-        }).catch(console.log);
-    }
+async function getForecastHourlyAPI(url, setForecastHourly) {
+    if (!url) return;
+    fetch(url)
+    .then(res => res.json())
+    .then((data) => {
+        setForecastHourly(data);
+    }).catch(console.log);
+}
 
-    async getForecastAPI() {
-        if (!this.state.forecast.url) return;
-        if (this.state.forecast.data) return;
-        fetch(this.state.forecast.url)
-        .then(res => res.json())
-        .then((data) => {
-            this.setState({
-                ...this.state,
-                forecast: {
-                    ...this.state.forecast,
-                    data: data,
-                },
-            });
-        }).catch(console.log);
-    }
+async function getLatLongFromZipAPI(zipcode, setSearchParams) {
+    const url = new URL("https://forecast.weather.gov/zipcity.php?" + new URLSearchParams({inputstring: zipcode}));
+    fetch(url)
+    .then(res => new URL(res.url))
+    .then((data) => {
+        if (data.searchParams.get("inputstring")) return;
+        const lat = data.searchParams.get("lat");
+        const long = data.searchParams.get("lon");
+        setSearchParams({lat: lat, long: long});
+    }).catch(console.log);
+}
 
-    async getForecastHourlyAPI() {
-        if (!this.state.forecastHourly.url) return;
-        if (this.state.forecastHourly.data) return;
-        fetch(this.state.forecastHourly.url)
-        .then(res => res.json())
-        .then((data) => {
-            this.setState({
-                ...this.state,
-                forecastHourly:{
-                    ...this.state.forecastHourly,
-                    data: data,
-                },
-            })
-        }).catch(console.log);
-    }
+async function getWeatherAPI(lat, long, setForecast, setForecastHourly, setCity, setUSState) {
+    const url = 'https://api.weather.gov/points/' + lat + ',' + long;
+    fetch(url)
+    .then(res => res.json())
+    .then((data) => {
+        setCity(data.properties.relativeLocation.properties.city);
+        setUSState(data.properties.relativeLocation.properties.state);
+        getForecastAPI(data.properties.forecast, setForecast);
+        getForecastHourlyAPI(data.properties.forecastHourly, setForecastHourly);
+    }).catch(console.log);
+}
 
-    async getLatLongFromZipAPI(zipcode) {
-        const url = new URL("https://forecast.weather.gov/zipcity.php?" + new URLSearchParams({inputstring: zipcode}));
-        fetch(url)
-        .then(res => new URL(res.url))
-        .then((data) => {
-            if (data.searchParams.get("inputstring")) return;
-            const lat = data.searchParams.get("lat");
-            const long = data.searchParams.get("lon")
-            this.setState({
-                ...this.state,
-                lat: lat,
-                long: long,
-            }, () => this.getWeatherAPI())
-        }).catch(console.log);
-    }
+function Weather(props) {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [usState, setUSState] = useState("NY");
+    const [city, setCity] = useState("Binghamton");
+    const [forecast, setForecast] = useState(null);
+    const [hourlyForecast, setHourlyForecast] = useState(null);
 
-    getForecast() {
-        this.getForecastAPI()
-        .then(() => {
-        this.setState({
-            ...this.state,
-            forecastDisplayHourly: false,
-            })
-        }).catch(console.log);
-    }
+    useEffect(() => {
+        const lat = searchParams.get("lat");
+        const long = searchParams.get("long");
+        if (lat !== null && long !== null){
+            getWeatherAPI(lat, long,  setForecast, setHourlyForecast, setCity, setUSState);
+        }
+    }, [searchParams]);
 
-    getForecastHourly() {
-        this.getForecastHourlyAPI()
-        .then(() => {
-            this.setState({
-                ...this.state,
-                forecastDisplayHourly: true,
-            })
-        }).catch(console.log);
-    }
+    const forecastData = forecast === null ? null : {...forecast, city: city, state: usState};
+    const hourlyForecastData = hourlyForecast === null ? null : {...hourlyForecast, city: city, state: usState};
 
-    getLatLongFromZip(event) {
-        event.preventDefault();
-        this.getLatLongFromZipAPI(event.target.zipcode.value);
-    }
-
-    getDisplayData() {
-        if (this.state.forecastDisplayHourly === null) return null;
-        if (this.state.forecastDisplayHourly) return this.state.forecastHourly.data;
-        return this.state.forecast.data;
-    }
-
-    componentDidMount() {
-        this.getWeatherAPI();
-    }
-
-    render() {
-        return (
-            <div className="Weather">
-            <form onSubmit={(e) => this.getLatLongFromZip(e)}>
+    return (
+        <div>
+        <Navbar>
+            <Link to={{
+                pathname: "forecast",
+                search: searchParams.toString(),
+            }}>Forecast</Link>
+            <Link to={{
+                pathname: "hourlyforecast",
+                search: searchParams.toString(),
+            }} query={searchParams}>Hourly Forecast</Link>
+        </Navbar>
+        <div className="Weather">
+            <form onSubmit={(e) => {
+                e.preventDefault();
+                getLatLongFromZipAPI(e.target.zipcode.value, setSearchParams);
+                }}>
                 <label htmlFor="zipcode">Zip Code:</label>
                 <input label="zipcode" type="text" name="zipcode"/>
                 <input type="submit" value="Enter"/>
             </form>
-            <button onClick={this.getForecast.bind(this)}>
-                Get the forecast
-            </button>
-            <button onClick={this.getForecastHourly.bind(this)}>
-                Get the hourly forecast
-            </button>
-            <ForecastTable forecastData={this.getDisplayData()}/>
-            </div>
-        ); 
-    }
+            <Routes>
+                <Route path="forecast" element={<ForecastTable forecastData={forecastData}/>}/>
+                <Route path="hourlyForecast" element={<ForecastTable forecastData={hourlyForecastData}/>}/>
+            </Routes>
+        </div>
+        </div>
+    );
 }
 
 export default Weather;
